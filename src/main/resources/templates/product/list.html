@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+
+    <th:block th:replace="/layout/head" />
+</head>
+<body>
+    <div class="container-fluid">
+        <th:block th:replace="/customer/header" />
+
+        <div class="form-group" id="panel-product">
+<!--            <div class="content mr2 fl">-->
+<!--                <div class="card" style="width: 18rem;">-->
+<!--                    <img src="/assets/img/bia-huda-gold-lon-330ml-286x180.jpg" class="card-img-top" alt="...">-->
+<!--                    <div class="card-body">-->
+<!--                        <h5 class="card-title">Bia Huda Gold</h5>-->
+<!--                        <p class="card-text">15.000 vnđ</p>-->
+<!--                        <a href="#" class="btn btn-primary">Add to cart</a>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+        </div>
+    </div>
+
+    <div id="panelCart" class="hide">
+        <button id="btnCloseCart">Close</button>
+        <div class="card mb-3" style="max-width: 100%;">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="/assets/img/bia-huda-gold-lon-330ml-286x180.jpg" width="150px" class="img-fluid rounded-start" alt="...">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">Bia Huda Gold</h5>
+                        <p class="card-text">
+                            <span class="price">15.000</span>
+                            <span><button class="btn btn-danger minus">-</button></span>
+                            <span><input type="text" class="form-control quantity" value="10"></span>
+                            <span><button class="btn btn-success add">+</button></span>
+                            <span class="amount">150.000</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3" style="max-width: 100%;">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="/assets/img/bia-huda-gold-lon-330ml-286x180.jpg" width="150px" class="img-fluid rounded-start" alt="...">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">Bia Huda Gold</h5>
+                        <p class="card-text">
+                            <span class="price">15.000</span>
+                            <span><button class="btn btn-danger minus">-</button></span>
+                            <span><input type="text" class="form-control quantity" value="10"></span>
+                            <span><button class="btn btn-success add">+</button></span>
+                            <span class="amount">150.000</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block th:replace="/layout/script" />
+
+    <script src="/assets/js/app.page.js"></script>
+
+    <script>
+        $("#btnShowCart").on("click", () => {
+            $("#panelCart").removeClass("hide").addClass("show");
+        })
+
+        $("#btnCloseCart").on("click", () => {
+            $("#panelCart").removeClass("show").addClass("hide");
+        })
+
+        function getAllProducts() {
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "GET",
+                url: "http://localhost:9000/api/products"
+            })
+            .done((data) => {
+
+                $.each(data, (i, item) => {
+                    let str = AppPage.renderProductItem(item);
+                    $("#panel-product").prepend(str);
+                })
+
+                handleAddCart();
+
+            })
+            .fail((jqXHR) => {
+                console.log((jqXHR));
+            })
+        }
+
+        function handleAddCart() {
+            $(".add-cart").on("click", function () {
+                let productId = $(this).data("id");
+
+                let cartItem = {
+                    productId
+                }
+
+                $.ajax({
+                    headers: {
+                        "accept": "application/json",
+                        "content-type": "application/json"
+                    },
+                    type: "POST",
+                    url: "http://localhost:9000/api/carts/add",
+                    data: JSON.stringify(cartItem)
+                })
+                    .done((resp) => {
+
+                        if (resp.response.status === 201) {
+                            alert("Thêm sản phẩm vào giỏ hàng thành công");
+                        }
+
+                    })
+                    .fail((jqXHR) => {
+                        console.log((jqXHR));
+                    })
+
+            })
+        }
+
+        $(() => {
+            getAllProducts();
+        })
+    </script>
+</body>
+</html>

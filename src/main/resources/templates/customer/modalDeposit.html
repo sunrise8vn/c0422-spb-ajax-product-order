@@ -1,0 +1,40 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="modalDeposit">
+    <div class="modal fade" id="modalDeposit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal deposit money</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="" id="frmWithdraw">
+                        <div class="row">
+                            <div class="col-lg-6 mt-3">
+                                <label for="customerIdDep">Customer Id</label>
+                                <input type="text" class="form-control" id="customerIdDep" readonly>
+                            </div>
+                            <div class="col-lg-6 mt-3">
+                                <label for="fullNameDep">Full name</label>
+                                <input type="text" class="form-control" id="fullNameDep" readonly>
+                            </div>
+                            <div class="col-lg-6 mt-3">
+                                <label for="balanceDep">Current balance ($)</label>
+                                <input type="text" class="form-control" id="balanceDep" readonly>
+                            </div>
+                            <div class="col-lg-6 mt-3">
+                                <label for="transactionAmountDep">Transaction Amount ($)</label>
+                                <input type="text" class="form-control" id="transactionAmountDep">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-success" id="btnDeposit">Deposit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>

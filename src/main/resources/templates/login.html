@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+    <h1>Hello anonymous</h1>
+    <form>
+        <input type="text" id="username">
+        <input type="text" id="password">
+        <button type="button" id="btnLogin">Login</button>
+    </form>
+
+    <th:block th:replace="/layout/script" />
+
+    <script>
+        $("#btnLogin").on("click", () => {
+            let username = $("#username").val();
+            let password = $("#password").val();
+
+            let user = {
+                username,
+                password
+            }
+
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "post",
+                url: "http://localhost:9000/api/auth/login",
+                data: JSON.stringify(user)
+            })
+            .done(() => {
+                window.location.href = "/customers";
+            })
+            .fail((jqXHR) => {
+                console.log(jqXHR);
+            })
+
+        })
+    </script>
+
+</body>
+</html>

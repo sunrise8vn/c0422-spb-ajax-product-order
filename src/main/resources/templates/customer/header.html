@@ -1,0 +1,29 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="header">
+    <header>
+        <div class="row col-lg-12">
+            <div class="col-lg-5">
+                <h1>List of customers</h1>
+            </div>
+            <div class="col-lg-7">
+                <div class="col-lg-2">
+                    <button id="btnShowCart" class="btn btn-outline-light">
+                        <i class="fas fa-cart-arrow-down"></i>
+                        Cart
+                    </button>
+                </div>
+                <div class="col-lg-3">
+                    <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#modalCreateCustomer">
+                        Add new customer
+                    </button>
+                </div>
+                <div class="col-lg-3">
+                    <button class="btn btn-outline-light">
+                        Transfer histories
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+</th:block>

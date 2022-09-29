@@ -1,0 +1,41 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="modalUpdate">
+    <div class="modal fade" id="modalUpdateCustomer" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal update customer's information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="" id="frmUpdate">
+                        <input type="hidden" id="customerIdUp">
+                        <div class="row">
+                            <div class="col-lg-6 mt-3">
+                                <label for="fullNameUp">Full name</label>
+                                <input type="text" class="form-control" id="fullNameUp">
+                            </div>
+                            <div class="col-lg-6 mt-3">
+                                <label for="emailUp">Email</label>
+                                <input type="email" class="form-control" id="emailUp" readonly>
+                            </div>
+                            <div class="col-lg-6 mt-3">
+                                <label for="phoneUp">Phone</label>
+                                <input type="tel" class="form-control" id="phoneUp">
+                            </div>
+                            <div class="col-lg-6 mt-3">
+                                <label for="addressUp">Address</label>
+                                <input type="text" class="form-control" id="addressUp">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-success" id="btnUpdate">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
