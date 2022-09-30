@@ -1,6 +1,7 @@
 package com.cg.service.cartItem;
 
 
+import com.cg.model.Cart;
 import com.cg.model.CartItem;
 import com.cg.model.Product;
 import com.cg.repository.CartItemRepository;
@@ -31,7 +32,27 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     public Optional<CartItem> findById(Long id) {
-        return Optional.empty();
+        return cartItemRepository.findById(id);
+    }
+
+    @Override
+    public List<CartItem> findByCart(Cart cart) {
+        return cartItemRepository.findByCart(cart);
+    }
+
+    @Override
+    public Optional<CartItem> findByCartAndProduct(Cart cart, Product product) {
+        return cartItemRepository.findByCartAndProduct(cart, product);
+    }
+
+    @Override
+    public long countCartItemByCart(Cart cart) {
+        return cartItemRepository.countCartItemByCart(cart);
+    }
+
+    @Override
+    public long countCartItemByCartId(long cartId) {
+        return cartItemRepository.countCartItemByCartId(cartId);
     }
 
     @Override
@@ -51,6 +72,6 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     public void remove(Long id) {
-
+        cartItemRepository.deleteById(id);
     }
 }

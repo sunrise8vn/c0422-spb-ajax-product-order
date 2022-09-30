@@ -26,45 +26,29 @@
 
     <div id="panelCart" class="hide">
         <button id="btnCloseCart">Close</button>
-        <div class="card mb-3" style="max-width: 100%;">
-            <div class="row g-0">
-                <div class="col-md-4">
-                    <img src="/assets/img/bia-huda-gold-lon-330ml-286x180.jpg" width="150px" class="img-fluid rounded-start" alt="...">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h5 class="card-title">Bia Huda Gold</h5>
-                        <p class="card-text">
-                            <span class="price">15.000</span>
-                            <span><button class="btn btn-danger minus">-</button></span>
-                            <span><input type="text" class="form-control quantity" value="10"></span>
-                            <span><button class="btn btn-success add">+</button></span>
-                            <span class="amount">150.000</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="card mb-3" style="max-width: 100%;">
-            <div class="row g-0">
-                <div class="col-md-4">
-                    <img src="/assets/img/bia-huda-gold-lon-330ml-286x180.jpg" width="150px" class="img-fluid rounded-start" alt="...">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h5 class="card-title">Bia Huda Gold</h5>
-                        <p class="card-text">
-                            <span class="price">15.000</span>
-                            <span><button class="btn btn-danger minus">-</button></span>
-                            <span><input type="text" class="form-control quantity" value="10"></span>
-                            <span><button class="btn btn-success add">+</button></span>
-                            <span class="amount">150.000</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="cart-items"></div>
+
+<!--        <div class="card mb-3" style="max-width: 100%;">-->
+<!--            <div class="row g-0">-->
+<!--                <div class="col-md-4">-->
+<!--                    <img src="/assets/img/bia-huda-gold-lon-330ml-286x180.jpg" width="150px" class="img-fluid rounded-start" alt="...">-->
+<!--                </div>-->
+<!--                <div class="col-md-8">-->
+<!--                    <div class="card-body">-->
+<!--                        <h5 class="card-title">Bia Huda Gold</h5>-->
+<!--                        <p class="card-text">-->
+<!--                            <span class="price">15.000</span>-->
+<!--                            <span><button class="btn btn-danger minus">-</button></span>-->
+<!--                            <span><input type="text" class="form-control quantity" value="10"></span>-->
+<!--                            <span><button class="btn btn-success add">+</button></span>-->
+<!--                            <span class="amount">150.000</span>-->
+<!--                        </p>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
     </div>
 
     <th:block th:replace="/layout/script" />
@@ -72,13 +56,160 @@
     <script src="/assets/js/app.page.js"></script>
 
     <script>
+
+        function getCartItems() {
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "GET",
+                url: "http://localhost:9000/api/cart-items"
+            })
+                .done((data) => {
+                    $("#panelCart .cart-items").empty();
+
+                    $.each(data, (i, item) => {
+                        let str = AppPage.renderCartItem(item);
+                        $("#panelCart .cart-items").append(str);
+                    })
+
+                    handleAddQuantity();
+
+                    handleMinusQuantity();
+
+                })
+                .fail((jqXHR) => {
+                    console.log((jqXHR));
+                })
+        }
+
+
         $("#btnShowCart").on("click", () => {
+
+            getCartItems();
+
             $("#panelCart").removeClass("hide").addClass("show");
         })
 
         $("#btnCloseCart").on("click", () => {
             $("#panelCart").removeClass("show").addClass("hide");
         })
+
+        function addQuantity(cartItemId) {
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "PATCH",
+                url: "http://localhost:9000/api/cart-items/add/" + cartItemId
+            })
+                .done((data) => {
+
+                    let currentCartItemRow = $("#ci_" + cartItemId);
+                    let newCartItemRow = AppPage.renderCartItem(data);
+
+                    currentCartItemRow.replaceWith(newCartItemRow);
+
+                    $("header .cart-quantity").text(data.totalCartItemQuantity);
+
+                    handleAddQuantity();
+
+                    handleMinusQuantity();
+                })
+                .fail((jqXHR) => {
+                    console.log((jqXHR));
+                })
+        }
+
+        function removeCartItem(cartItemId) {
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "DELETE",
+                url: "http://localhost:9000/api/cart-items/delete/" + cartItemId
+            })
+                .done((data) => {
+                    $("#ci_" + cartItemId).remove();
+
+                    $("header .cart-quantity").text(data.totalCartItemQuantity);
+                })
+                .fail((jqXHR) => {
+                    console.log((jqXHR));
+                })
+        }
+
+        function minusQuantity(cartItemId) {
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "PATCH",
+                url: "http://localhost:9000/api/cart-items/minus/" + cartItemId
+            })
+                .done((data) => {
+
+                    let currentCartItemRow = $("#ci_" + cartItemId);
+                    let newCartItemRow = AppPage.renderCartItem(data);
+
+                    currentCartItemRow.replaceWith(newCartItemRow);
+
+                    $("header .cart-quantity").text(data.totalCartItemQuantity);
+
+                    handleAddQuantity();
+
+                    handleMinusQuantity();
+                })
+                .fail((jqXHR) => {
+                    console.log((jqXHR));
+                })
+        }
+
+        function handleAddQuantity() {
+            let btnAddQuantity = $("#panelCart .cart-items .card-body button.add");
+
+            btnAddQuantity.off();
+
+            btnAddQuantity.on("click", function () {
+                let cartItemId = $(this).data("id");
+
+                addQuantity(cartItemId);
+            })
+        }
+
+        function handleMinusQuantity() {
+            let btnMinusQuantity = $("#panelCart .cart-items .card-body button.minus");
+
+            btnMinusQuantity.off();
+
+            btnMinusQuantity.on("click", function () {
+
+                let cartItemId = $(this).data("id");
+
+                let currentQuantity = +$(`#ci_${cartItemId} .card-body input.quantity`).val();
+
+                if (currentQuantity === 1) {
+                    Swal.fire({
+                        text: "Bạn chắc chắn muốn bỏ sản phẩm này ra khỏi giỏ hàng?",
+                        icon: 'information',
+                        showCancelButton: true,
+                        cancelButtonText: "Hủy",
+                        confirmButtonColor: '#d33',
+                        confirmButtonText: 'Đồng ý'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            removeCartItem(cartItemId);
+                        }
+                    })
+                } else {
+                    minusQuantity(cartItemId);
+                }
+            })
+        }
 
         function getAllProducts() {
             $.ajax({
@@ -121,12 +252,21 @@
                     url: "http://localhost:9000/api/carts/add",
                     data: JSON.stringify(cartItem)
                 })
-                    .done((resp) => {
+                    .done((data) => {
 
-                        if (resp.response.status === 201) {
-                            alert("Thêm sản phẩm vào giỏ hàng thành công");
-                        }
+                        let { totalCartItemQuantity } = data;
 
+                        $("header .cart-quantity").text(totalCartItemQuantity);
+
+                        Swal.fire({
+                            title: 'Added',
+                            text: "Thêm sản phẩm vào giỏ hàng thành công",
+                            icon: 'success',
+                            showCancelButton: false,
+                            showCloseButton: false,
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
                     })
                     .fail((jqXHR) => {
                         console.log((jqXHR));

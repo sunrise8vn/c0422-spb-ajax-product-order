@@ -1,10 +1,13 @@
 package com.cg.model;
 
 
+import com.cg.model.dto.CartItemDTO;
+import com.cg.model.dto.CartItemInfoDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.type.CharacterArrayNClobType;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -40,4 +43,27 @@ public class CartItem extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "cart_id", referencedColumnName = "id", nullable = false)
     private Cart cart;
+
+    public CartItemInfoDTO toCartItemInfoDTO() {
+        return new CartItemInfoDTO()
+                .setId(id)
+                .setProductName(productName)
+                .setAvatar(product.getAvatar())
+                .setProductPrice(productPrice)
+                .setQuantity(quantity)
+                .setUnit(unit)
+                .setAmount(amount);
+    }
+
+    public CartItemInfoDTO toCartItemInfoDTOWithCountQuantity(long totalCartItemQuantity) {
+        return new CartItemInfoDTO()
+                .setId(id)
+                .setProductName(productName)
+                .setAvatar(product.getAvatar())
+                .setProductPrice(productPrice)
+                .setQuantity(quantity)
+                .setUnit(unit)
+                .setAmount(amount)
+                .setTotalCartItemQuantity(totalCartItemQuantity);
+    }
 }

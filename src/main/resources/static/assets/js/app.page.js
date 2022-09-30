@@ -50,4 +50,34 @@ class AppPage {
             </div>
         `;
     }
+
+    static renderCartItem(obj) {
+        return `
+            <div id="ci_${obj.id}" class="card mb-3" style="max-width: 100%;">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="/assets/img/${obj.avatar}" width="150px" class="img-fluid rounded-start" alt="...">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">${obj.productName}</h5>
+                            <p class="card-text">
+                                <span class="price">${obj.productPrice}</span>
+                                <span>
+                                    <button class="btn btn-danger minus" data-id="${obj.id}">-</button>
+                                </span>
+                                <span>
+                                    <input type="text" class="form-control quantity" data-id="${obj.id}" value="${obj.quantity}">
+                                </span>
+                                <span>
+                                    <button class="btn btn-success add" data-id="${obj.id}">+</button>
+                                </span>
+                                <span class="amount">${obj.amount}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
 }

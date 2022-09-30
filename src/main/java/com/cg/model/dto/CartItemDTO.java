@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class CartItemCreateDTO {
+public class CartItemDTO {
 
     private Long id;
 

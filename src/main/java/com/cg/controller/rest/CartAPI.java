@@ -3,7 +3,7 @@ package com.cg.controller.rest;
 
 import com.cg.exception.DataInputException;
 import com.cg.model.*;
-import com.cg.model.dto.CartItemCreateDTO;
+import com.cg.model.dto.CartItemDTO;
 import com.cg.service.cart.CartService;
 import com.cg.service.cartItem.CartItemService;
 import com.cg.service.customer.ICustomerService;
@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -42,9 +44,9 @@ public class CartAPI {
 
 
     @PostMapping("/add")
-    public ResponseEntity<?> addCart(@RequestBody CartItemCreateDTO cartItemCreateDTO) {
+    public ResponseEntity<?> addCart(@RequestBody CartItemDTO cartItemDTO) {
 
-        Long productId = cartItemCreateDTO.getProductId();
+        Long productId = cartItemDTO.getProductId();
 
         Optional<Product> productOptional = productService.findById(productId);
 
@@ -54,19 +56,22 @@ public class CartAPI {
 
         Product product = productOptional.get();
 
-        String customerName = appUtils.getPrincipal();
+        String username = appUtils.getPrincipal();
 
-        User user = userService.findByUsername(customerName).get();
+        User user = userService.findByUsername(username).get();
 
         Optional<Cart> cartOptional = cartService.findByUser(user);
 
+        Cart cart = new Cart();
+
         if (!cartOptional.isPresent()) {
 
-            Cart cart = new Cart();
             cart.setTotalAmount(product.getPrice());
             cart.setUser(user);
 
             Cart newCart = cartService.save(cart);
+
+            cart = newCart;
 
             CartItem cartItem = new CartItem();
             cartItem.setId(0L);
@@ -79,41 +84,47 @@ public class CartAPI {
             cartItem.setUnit(product.getUnit());
 
             cartItemService.save(cartItem);
+        }
+        else {
+            cart = cartOptional.get();
 
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            Optional<CartItem> cartItemOptional = cartItemService.findByProduct(product);
+
+            if (!cartItemOptional.isPresent()) {
+                CartItem cartItem = new CartItem();
+                cartItem.setId(0L);
+                cartItem.setCart(cartOptional.get());
+                cartItem.setProduct(product);
+                cartItem.setProductName(product.getName());
+                cartItem.setProductPrice(product.getPrice());
+                cartItem.setQuantity(1L);
+                cartItem.setAmount(product.getPrice());
+                cartItem.setUnit(product.getUnit());
+
+                cartItemService.save(cartItem);
+            }
+            else {
+                CartItem cartItem = cartItemOptional.get();
+
+                long oldQuantity = cartItem.getQuantity();
+                long newQuantity = oldQuantity + 1;
+                BigDecimal newPrice = product.getPrice();
+                BigDecimal newAmount = newPrice.multiply(new BigDecimal(newQuantity));
+
+                cartItem.setProductName(product.getName());
+                cartItem.setProductPrice(newPrice);
+                cartItem.setQuantity(newQuantity);
+                cartItem.setAmount(newAmount);
+                cartItemService.save(cartItem);
+            }
         }
 
-        Optional<CartItem> cartItemOptional = cartItemService.findByProduct(product);
+        long countQuantity = cartItemService.countCartItemByCart(cart);
 
-        if (!cartItemOptional.isPresent()) {
-            CartItem cartItem = new CartItem();
-            cartItem.setId(0L);
-            cartItem.setCart(cartOptional.get());
-            cartItem.setProduct(product);
-            cartItem.setProductName(product.getName());
-            cartItem.setProductPrice(product.getPrice());
-            cartItem.setQuantity(1L);
-            cartItem.setAmount(product.getPrice());
-            cartItem.setUnit(product.getUnit());
+        Map<String, Long> results = new HashMap<>();
+        results.put("totalCartItemQuantity", countQuantity);
 
-            cartItemService.save(cartItem);
+        return new ResponseEntity<>(results, HttpStatus.CREATED);
 
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        }
-
-        CartItem cartItem = cartItemOptional.get();
-
-        Long oldQuantity = cartItem.getQuantity();
-        Long newQuantity = oldQuantity + 1;
-        BigDecimal newPrice = product.getPrice();
-        BigDecimal newAmount = newPrice.multiply(new BigDecimal(newQuantity));
-
-        cartItem.setProductName(product.getName());
-        cartItem.setProductPrice(newPrice);
-        cartItem.setQuantity(newQuantity);
-        cartItem.setAmount(newAmount);
-        cartItemService.save(cartItem);
-
-        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
