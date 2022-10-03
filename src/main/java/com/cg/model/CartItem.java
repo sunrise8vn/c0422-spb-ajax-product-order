@@ -66,4 +66,15 @@ public class CartItem extends BaseEntity {
                 .setAmount(amount)
                 .setTotalCartItemQuantity(totalCartItemQuantity);
     }
+
+    public BillDetail toBillDetail(Bill bill) {
+        return new BillDetail()
+                .setId(id)
+                .setProductName(productName)
+                .setProductPrice(productPrice)
+                .setQuantity(quantity)
+                .setUnit(unit)
+                .setAmount(amount)
+                .setBill(bill);
+    }
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,6 +49,11 @@ public class CartItemServiceImpl implements CartItemService {
     @Override
     public long countCartItemByCart(Cart cart) {
         return cartItemRepository.countCartItemByCart(cart);
+    }
+
+    @Override
+    public BigDecimal getSumAmount(long cartId) {
+        return cartItemRepository.getSumAmount(cartId);
     }
 
     @Override

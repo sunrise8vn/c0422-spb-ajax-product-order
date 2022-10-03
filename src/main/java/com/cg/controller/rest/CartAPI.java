@@ -4,6 +4,8 @@ package com.cg.controller.rest;
 import com.cg.exception.DataInputException;
 import com.cg.model.*;
 import com.cg.model.dto.CartItemDTO;
+import com.cg.service.bill.BillService;
+import com.cg.service.billDetail.BillDetailService;
 import com.cg.service.cart.CartService;
 import com.cg.service.cartItem.CartItemService;
 import com.cg.service.customer.ICustomerService;
@@ -16,9 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/carts")
@@ -38,6 +38,12 @@ public class CartAPI {
 
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private BillService billService;
+
+    @Autowired
+    private BillDetailService billDetailService;
 
     @Autowired
     private AppUtils appUtils;
@@ -88,7 +94,7 @@ public class CartAPI {
         else {
             cart = cartOptional.get();
 
-            Optional<CartItem> cartItemOptional = cartItemService.findByProduct(product);
+            Optional<CartItem> cartItemOptional = cartItemService.findByCartAndProduct(cart, product);
 
             if (!cartItemOptional.isPresent()) {
                 CartItem cartItem = new CartItem();
@@ -117,6 +123,12 @@ public class CartAPI {
                 cartItem.setAmount(newAmount);
                 cartItemService.save(cartItem);
             }
+
+            BigDecimal bAmount = cartItemService.getSumAmount(cart.getId());
+
+            cart.setTotalAmount(bAmount);
+
+            cartService.save(cart);
         }
 
         long countQuantity = cartItemService.countCartItemByCart(cart);
@@ -126,5 +138,32 @@ public class CartAPI {
 
         return new ResponseEntity<>(results, HttpStatus.CREATED);
 
+    }
+
+
+    @PostMapping("/checkout")
+    public ResponseEntity<?> checkout() {
+        String username = appUtils.getPrincipal();
+
+        Optional<User> userOptional = userService.findByUsername(username);
+
+        if (!userOptional.isPresent()) {
+            throw new DataInputException("Mã khách hàng không hợp lệ (MS001)");
+        }
+
+        User user = userOptional.get();
+
+        try {
+            boolean success = cartService.checkout(user);
+
+            if (success) {
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+
+            throw new DataInputException("Liên hệ với quản trị hệ thống (MS001)");
+
+        } catch (Exception e) {
+            throw new DataInputException("Liên hệ với quản trị hệ thống (MS002)");
+        }
     }
 }

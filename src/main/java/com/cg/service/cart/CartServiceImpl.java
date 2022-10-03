@@ -1,9 +1,11 @@
 package com.cg.service.cart;
 
 
-import com.cg.model.Cart;
-import com.cg.model.Customer;
-import com.cg.model.User;
+import com.cg.exception.DataInputException;
+import com.cg.model.*;
+import com.cg.repository.BillDetailRepository;
+import com.cg.repository.BillRepository;
+import com.cg.repository.CartItemRepository;
 import com.cg.repository.CartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,15 @@ public class CartServiceImpl implements CartService {
 
     @Autowired
     private CartRepository cartRepository;
+
+    @Autowired
+    private CartItemRepository cartItemRepository;
+
+    @Autowired
+    private BillRepository billRepository;
+
+    @Autowired
+    private BillDetailRepository billDetailRepository;
 
     @Override
     public List<Cart> findAll() {
@@ -46,6 +57,42 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void remove(Long id) {
+        cartRepository.deleteById(id);
+    }
 
+    @Override
+    public boolean checkout(User user) {
+        boolean success = false;
+
+        try {
+            Optional<Cart> cartOptional = cartRepository.findByUser(user);
+
+            if (!cartOptional.isPresent()) {
+                throw new DataInputException("Mã khách hàng không hợp lệ (MS002)");
+            }
+
+            Cart cart = cartOptional.get();
+
+            Bill bill = cart.toBill();
+            Bill newBill = billRepository.save(bill);
+
+            List<CartItem> cartItems = cartItemRepository.findByCart(cart);
+
+            for (CartItem item : cartItems) {
+                BillDetail billDetail = item.toBillDetail(newBill);
+
+                billDetailRepository.save(billDetail);
+
+                cartItemRepository.deleteById(item.getId());
+            }
+
+            cartRepository.deleteById(cart.getId());
+
+            success = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return success;
     }
 }

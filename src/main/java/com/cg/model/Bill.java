@@ -18,7 +18,7 @@ import java.util.List;
 @Entity
 @Table(name = "bills")
 @Accessors(chain = true)
-public class Bill {
+public class Bill extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

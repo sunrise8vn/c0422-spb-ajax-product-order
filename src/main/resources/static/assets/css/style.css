@@ -76,3 +76,9 @@ tbody tr:hover {
     background-color: red;
     border-radius: 50%;
 }
+
+.div-checkout {
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+}

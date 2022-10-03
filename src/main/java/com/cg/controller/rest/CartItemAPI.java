@@ -96,6 +96,14 @@ public class CartItemAPI {
 
         CartItem newCartItem = cartItemService.save(cartItem);
 
+        Cart cart = cartItem.getCart();
+
+        BigDecimal bAmount = cartItemService.getSumAmount(cart.getId());
+
+        cart.setTotalAmount(bAmount);
+
+        cartService.save(cart);
+
         long totalCartItemQuantity = cartItemService.countCartItemByCart(cartItem.getCart());
 
         return new ResponseEntity<>(newCartItem.toCartItemInfoDTOWithCountQuantity(totalCartItemQuantity), HttpStatus.OK);
@@ -126,6 +134,14 @@ public class CartItemAPI {
 
         CartItem newCartItem = cartItemService.save(cartItem);
 
+        Cart cart = cartItem.getCart();
+
+        BigDecimal bAmount = cartItemService.getSumAmount(cart.getId());
+
+        cart.setTotalAmount(bAmount);
+
+        cartService.save(cart);
+
         long totalCartItemQuantity = cartItemService.countCartItemByCart(cartItem.getCart());
 
         return new ResponseEntity<>(newCartItem.toCartItemInfoDTOWithCountQuantity(totalCartItemQuantity), HttpStatus.OK);
@@ -141,7 +157,17 @@ public class CartItemAPI {
             throw new DataInputException("Sản phẩm không hợp lệ");
         }
 
+        Optional<CartItem> cartItem = cartItemService.findById(cartItemId);
+
         cartItemService.remove(cartItemId);
+
+        Cart cart = cartItem.get().getCart();
+
+        BigDecimal bAmount = cartItemService.getSumAmount(cart.getId());
+
+        cart.setTotalAmount(bAmount);
+
+        cartService.save(cart);
 
         long totalCartItemQuantity = cartItemService.countCartItemByCart(cartItemOptional.get().getCart());
 
@@ -149,5 +175,16 @@ public class CartItemAPI {
         results.put("totalCartItemQuantity", totalCartItemQuantity);
 
         return new ResponseEntity<>(results, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/amount/{cartId}")
+    public String getTotalAmountByCartId(@PathVariable long cartId) {
+
+        BigDecimal bAmount = cartItemService.getSumAmount(cartId);
+
+        String amount = bAmount.toString();
+
+        return amount;
     }
 }

@@ -33,4 +33,11 @@ public class Cart extends BaseEntity {
     @OneToMany
     private List<CartItem> cartItems;
 
+    public Bill toBill() {
+        return new Bill()
+                .setId(0L)
+                .setTotalAmount(totalAmount)
+                .setUser(user);
+    }
+
 }

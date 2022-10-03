@@ -25,9 +25,15 @@
     </div>
 
     <div id="panelCart" class="hide">
-        <button id="btnCloseCart">Close</button>
+        <button id="btnCloseCart" class="btn btn-danger">Close</button>
 
         <div class="cart-items"></div>
+
+        <div class="cart-checkout div-checkout">
+            <button id="btnCheckout" class="btn btn-success">
+                Checkout
+            </button>
+        </div>
 
 <!--        <div class="card mb-3" style="max-width: 100%;">-->
 <!--            <div class="row g-0">-->
@@ -114,6 +120,13 @@
 
                     $("header .cart-quantity").text(data.totalCartItemQuantity);
 
+                    iziToast.success({
+                        title: 'OK',
+                        position: 'bottomLeft',
+                        timeout: 1500,
+                        message: 'Tăng số lượng sản phẩm thành công'
+                    });
+
                     handleAddQuantity();
 
                     handleMinusQuantity();
@@ -136,6 +149,14 @@
                     $("#ci_" + cartItemId).remove();
 
                     $("header .cart-quantity").text(data.totalCartItemQuantity);
+
+                    iziToast.success({
+                        title: 'OK',
+                        position: 'bottomLeft',
+                        timeout: 1500,
+                        message: 'Xóa sản phẩm khỏi giỏ thành công'
+                    });
+
                 })
                 .fail((jqXHR) => {
                     console.log((jqXHR));
@@ -159,6 +180,13 @@
                     currentCartItemRow.replaceWith(newCartItemRow);
 
                     $("header .cart-quantity").text(data.totalCartItemQuantity);
+
+                    iziToast.success({
+                        title: 'OK',
+                        position: 'bottomLeft',
+                        timeout: 1500,
+                        message: 'Giảm số lượng sản phẩm thành công'
+                    });
 
                     handleAddQuantity();
 
@@ -237,6 +265,9 @@
 
         function handleAddCart() {
             $(".add-cart").on("click", function () {
+
+                $("#btnCloseCart").trigger("click");
+
                 let productId = $(this).data("id");
 
                 let cartItem = {
@@ -258,15 +289,12 @@
 
                         $("header .cart-quantity").text(totalCartItemQuantity);
 
-                        Swal.fire({
-                            title: 'Added',
-                            text: "Thêm sản phẩm vào giỏ hàng thành công",
-                            icon: 'success',
-                            showCancelButton: false,
-                            showCloseButton: false,
-                            showConfirmButton: false,
-                            timer: 1500
-                        })
+                        iziToast.success({
+                            title: 'OK',
+                            position: 'bottomLeft',
+                            timeout: 1500,
+                            message: 'Thêm sản phẩm vào giỏ hàng thành công'
+                        });
                     })
                     .fail((jqXHR) => {
                         console.log((jqXHR));
@@ -275,8 +303,49 @@
             })
         }
 
+        function checkout() {
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "POST",
+                url: "http://localhost:9000/api/carts/checkout"
+            })
+                .done(() => {
+
+                    $("#panelCart .cart-items").empty();
+
+                    iziToast.success({
+                        title: 'OK',
+                        position: 'bottomLeft',
+                        timeout: 1500,
+                        message: 'Đặt hàng thành công'
+                    });
+
+                })
+                .fail((jqXHR) => {
+                    console.log((jqXHR));
+
+                    iziToast.error({
+                        title: 'ERROR',
+                        position: 'bottomLeft',
+                        timeout: 2000,
+                        message: 'Đặt hàng không thành công'
+                    });
+                })
+        }
+
+        function handleCheckout() {
+            $("#btnCheckout").on("click", () => {
+                checkout();
+            })
+        }
+
         $(() => {
             getAllProducts();
+
+            handleCheckout();
         })
     </script>
 </body>

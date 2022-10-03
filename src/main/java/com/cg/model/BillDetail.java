@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "bill_details")
 @Accessors(chain = true)
-public class BillDetail {
+public class BillDetail extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

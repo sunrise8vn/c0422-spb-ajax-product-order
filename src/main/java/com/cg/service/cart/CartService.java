@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface CartService extends IGeneralService<Cart> {
 
     Optional<Cart> findByUser(User user);
+
+    boolean checkout(User user);
 }
